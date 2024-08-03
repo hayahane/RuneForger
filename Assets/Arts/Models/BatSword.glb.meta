@@ -1,0 +1,32 @@
+fileFormatVersion: 2
+guid: c46de27ba1b72481ea5e487906cb3836
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BatSword
+    second: {fileID: 2100000, guid: f1663c5aec05e4e53bd4d3f3ac322bd7, type: 2}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: DefaultMaterial_BaseColor
+    second: {fileID: 2800000, guid: 1e1d8ff6b2a614b48a760d0b90e74e6e, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: DefaultMaterial_Metallic-DefaultMaterial_Roughness.standard
+    second: {fileID: 2800000, guid: c7798190f8d914dd8b4e379e7f876a9f, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: DefaultMaterial_Normal.normal
+    second: {fileID: 2800000, guid: 3b7843c1dca8c469fa9d5563c8e058e1, type: 3}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: cc45016b844e7624dae3aec10fb443ea, type: 3}
+  reverseAxis: 0
+  renderPipeline: 1
