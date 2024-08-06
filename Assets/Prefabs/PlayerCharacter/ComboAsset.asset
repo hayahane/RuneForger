@@ -16,6 +16,10 @@ MonoBehaviour:
   - Duration: 1.433
     TransTime: 0.833
     ExitTime: 1.1
+    AttackBeginTime: 0.495
+    AttackEndTime: 0.825
   - Duration: 1.533
     TransTime: 0.6
     ExitTime: 1.14
+    AttackBeginTime: 0.429
+    AttackEndTime: 0.66

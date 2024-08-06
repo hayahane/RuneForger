@@ -55,6 +55,8 @@ namespace RuneForger
         private void OnJumpInput(InputAction.CallbackContext context)
         {
             Character.IsJumping = context.started;
+            if (Character.IsJumping)
+                Debug.Log("Input Jumping");
         }
 
         private void OnLookInput(InputAction.CallbackContext context)

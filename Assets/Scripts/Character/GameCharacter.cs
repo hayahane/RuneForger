@@ -2,8 +2,9 @@ using KinematicCharacterController;
 using UnityEngine;
 using UnityHFSM;
 using Cinemachine.Utility;
-using System;
-using UnityEngine.PlayerLoop;
+using RuneForger.Attack;
+using RuneForger.SoundFX;
+using UnityEngine.VFX;
 
 namespace RuneForger.Character
 {
@@ -13,8 +14,6 @@ namespace RuneForger.Character
         public float HSpeed { get; set; } = 4.5f;
         [field: SerializeField]
         public float JumpHeight { get; set; } = 1.5f;
-        [field: SerializeField]
-        public float JumpTime { get; set; } = 1f;
         [field: SerializeField]
         public float JumpHeightExtra { get; set; } = 0.5f;
         [SerializeField, Header("Combo")]
@@ -33,6 +32,11 @@ namespace RuneForger.Character
             }
         }
 
+        [SerializeField]
+        private RandomSFX _sfx;
+        [field: SerializeField]
+        public RandomSFX Voice{get; private set;}
+
         public bool IsRotationLocked { get; set; }
         public Vector3 HVelocity { get; set; }
         public Vector3 VVelocity { get; set; }
@@ -44,6 +48,9 @@ namespace RuneForger.Character
         private Animator _animator;
         public Animator Animator => _animator;
         public RootMotionHelper RMHelper { get; private set; }
+        public AttackVolume AttackVolume { get; private set; }
+        [field: SerializeField]
+        public TrailRenderer Trail { get; private set; }
 
         #region MonoBehaviour Callbacks
         private void Start()
@@ -54,6 +61,8 @@ namespace RuneForger.Character
             Motor.CharacterController = this;
             _animator = GetComponentInChildren<Animator>();
             RMHelper = GetComponentInChildren<RootMotionHelper>();
+
+            AttackVolume = GetComponent<AttackVolume>();
 
             InitFSM();
             _fsm.Init();
@@ -87,8 +96,13 @@ namespace RuneForger.Character
                 },
                 onEnter: State =>
                 {
+                    _sfx.enabled = true;
                     _animator.SetBool("IsOnGround", true);
                     _animator.SetFloat("Speed", 1);
+                },
+                onExit: State =>
+                {
+                    _sfx.enabled = false;
                 }
             ));
             locomotionFSM.AddTransition(new Transition("Idle", "Move",
@@ -98,6 +112,7 @@ namespace RuneForger.Character
                 condition: transition => HVelocity.magnitude <= 0.1f
             ));
             _fsm.AddState("Locomotion", locomotionFSM);
+            locomotionFSM.SetStartState("Idle");
 
             // Fall & Jump States
             _fsm.AddState("Fall", new CharacterState(
@@ -116,6 +131,33 @@ namespace RuneForger.Character
             _fsm.AddTransition(new Transition("Fall", "Locomotion",
                 condition: transition => Motor.GroundingStatus.IsStableOnGround
             ));
+            _fsm.AddState("Jump", new CharacterState(
+                onUpdateVelocity: (currentVelocity, deltaTime) =>
+                {
+                    Debug.Log($"Must Unground: {Motor.MustUnground()}");
+                    Motor.ForceUnground();
+                    VVelocity += Physics.gravity * deltaTime;
+                    return VVelocity + currentVelocity.ProjectOntoPlane(Motor.CharacterUp);
+                },
+                onEnter: State =>
+                {
+                    Voice.PlayRandomly();
+                    _animator.SetTrigger("Jump");
+                    VVelocity = Vector3.up * Mathf.Sqrt(2 * JumpHeight * 9.81f);
+                    Motor.ForceUnground(VVelocity.magnitude / 9.81f);
+                    Debug.Log($"Init Velocity: {VVelocity}");
+                },
+                onExit: State =>
+                {
+                    IsJumping = false;
+                }
+            ));
+            _fsm.AddTransition(new Transition("Locomotion", "Jump",
+                condition: transition => IsJumping
+            ));
+            _fsm.AddTransition(new Transition("Jump", "Fall",
+                condition: transition => VVelocity.y <= 0
+            ));
 
             // Attack State
             _fsm.AddState("Attack", new AttackState(this) { ComboAsset = ComboAsset });
@@ -130,7 +172,7 @@ namespace RuneForger.Character
         private void Update()
         {
             _fsm.OnLogic();
-            Debug.Log(_fsm.ActiveStateName);
+            //Debug.Log(_fsm.ActiveStateName);
         }
 
         #endregion

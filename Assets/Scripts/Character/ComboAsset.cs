@@ -9,6 +9,8 @@ namespace RuneForger.Character
         public float Duration;
         public float TransTime;
         public float ExitTime;
+        public float AttackBeginTime;
+        public float AttackEndTime;
     }
 
     [CreateAssetMenu(fileName = "ComboAsset", menuName = "RF_Character/ComboAsset")]
