@@ -7,13 +7,13 @@ using RuneForger.Attack;
 
 namespace RuneForger.Character
 {
-    public interface IKCC
+    public interface IKcc
     {
         public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime);
         public void UpdateRotation(ref Quaternion currentRotation, float deltaTime);
     }
 
-    public class CharacterState : State, IKCC
+    public class CharacterState : State, IKcc
     {
         private readonly Func<Vector3, float, Vector3> _onUpdateVelocity;
         private readonly Func<Quaternion, float, Quaternion> _onUpdateRotation;
@@ -40,7 +40,7 @@ namespace RuneForger.Character
             _onUpdateRotation = onUpdateRotation;
         }
         
-        void IKCC.UpdateRotation(ref Quaternion currentRotation, float deltaTime)
+        void IKcc.UpdateRotation(ref Quaternion currentRotation, float deltaTime)
         {
             if (_onUpdateRotation != null)
             {
@@ -48,7 +48,7 @@ namespace RuneForger.Character
             }
         }
 
-        void IKCC.UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
+        void IKcc.UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
         {
             if (_onUpdateVelocity != null)
             {
@@ -65,11 +65,11 @@ namespace RuneForger.Character
             _character = character;
         }
     }
-    public class CharacterFSM : StateMachine, IKCC
+    public class CharacterFSM : StateMachine, IKcc
     {
         public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
         {
-            if (ActiveState is IKCC state)
+            if (ActiveState is IKcc state)
             {
                 state.UpdateVelocity(ref currentVelocity, deltaTime);
             }
@@ -77,14 +77,14 @@ namespace RuneForger.Character
 
         public void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
         {
-            if (ActiveState is IKCC state)
+            if (ActiveState is IKcc state)
             {
                 state.UpdateRotation(ref currentRotation, deltaTime);
             }
         }
     }
 
-    public class AttackState : CharacterStateBase, IKCC
+    public class AttackState : CharacterStateBase, IKcc
     {
         private int _attackStage = -1;
 
@@ -168,12 +168,12 @@ namespace RuneForger.Character
             _detectionTriggerd = false;
         }
 
-        void IKCC.UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
+        void IKcc.UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
         {
             currentVelocity = _character.RMHelper.StoredRootMotion.ProjectOntoPlane(_character.Motor.CharacterUp) / deltaTime;
         }
 
-        void IKCC.UpdateRotation(ref Quaternion currentRotation, float deltaTime)
+        void IKcc.UpdateRotation(ref Quaternion currentRotation, float deltaTime)
         {
         }
     }

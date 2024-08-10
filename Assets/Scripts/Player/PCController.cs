@@ -1,4 +1,3 @@
-using Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,9 +6,11 @@ namespace RuneForger
     public class PCController : MonoBehaviour
     {
         [SerializeField]
-        private PlayerInput _playerInput;
+        private PlayerInput playerInput;
         [field: SerializeField]
         public Character.GameCharacter Character { get; set; }
+        [field: SerializeField]
+        public Character.CharacterInteract Interact { get; set; }
         [field: SerializeField]
         public Camera ViewCamera { get; set; }
         [field: SerializeField]
@@ -19,26 +20,28 @@ namespace RuneForger
 
         private void Start()
         {
-            if (_playerInput == null)
+            if (playerInput == null)
             {
-                _playerInput = GetComponent<PlayerInput>();
+                playerInput = GetComponent<PlayerInput>();
             }
         }
 
         private void OnEnable()
         {
             Cursor.lockState = CursorLockMode.Locked;
-            _playerInput.actions["ReleaseCursor"].performed += OnReleaseCursorInput;
+            playerInput.actions["ReleaseCursor"].performed += OnReleaseCursorInput;
 
-            _playerInput.actions["Move"].performed += OnMoveInput;
-            _playerInput.actions["Move"].canceled += OnMoveInput;
-            _playerInput.actions["Jump"].started += OnJumpInput;
-            _playerInput.actions["Jump"].canceled += OnJumpInput;
-            _playerInput.actions["Look"].performed += OnLookInput;
-            _playerInput.actions["Look"].canceled += OnLookInput;
+            playerInput.actions["Move"].performed += OnMoveInput;
+            playerInput.actions["Move"].canceled += OnMoveInput;
+            playerInput.actions["Jump"].started += OnJumpInput;
+            playerInput.actions["Jump"].canceled += OnJumpInput;
+            playerInput.actions["Look"].performed += OnLookInput;
+            playerInput.actions["Look"].canceled += OnLookInput;
 
-            _playerInput.actions["Attack"].performed += context => Character.IsAttacking = true;
-            _playerInput.actions["Attack"].canceled += context => Character.IsAttacking = false;
+            playerInput.actions["Attack"].performed += _ => Character.IsAttacking = true;
+            playerInput.actions["Attack"].canceled += _ => Character.IsAttacking = false;
+
+            playerInput.actions["Interact"].performed += _ => Interact.Interact();
         }
 
         private void Update()

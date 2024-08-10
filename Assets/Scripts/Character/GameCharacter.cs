@@ -1,10 +1,13 @@
+using System;
 using KinematicCharacterController;
 using UnityEngine;
 using UnityHFSM;
 using Cinemachine.Utility;
 using RuneForger.Attack;
+using RuneForger.Gameplay;
 using RuneForger.SoundFX;
 using UnityEngine.VFX;
+using RuneForger.Interact;
 
 namespace RuneForger.Character
 {
@@ -32,7 +35,7 @@ namespace RuneForger.Character
             }
         }
 
-        [SerializeField]
+        [SerializeField, Header("Sound")]
         private RandomSFX _sfx;
         [field: SerializeField]
         public RandomSFX Voice{get; private set;}
@@ -64,55 +67,49 @@ namespace RuneForger.Character
 
             AttackVolume = GetComponent<AttackVolume>();
 
-            InitFSM();
+            InitFsm();
             _fsm.Init();
         }
 
-        private void InitFSM()
+        private void InitFsm()
         {
             // Locomotion Layer
-            var locomotionFSM = new CharacterFSM();
-            locomotionFSM.AddState("Idle", new CharacterState(
-                onUpdateVelocity: (currentVelocity, deltaTime) =>
-                {
-                    return Vector3.zero;
-                },
-                onEnter: State =>
+            var locomotionFsm = new CharacterFSM();
+            locomotionFsm.AddState("Idle", new CharacterState(
+                onUpdateVelocity: (currentVelocity, deltaTime) => Vector3.zero,
+                onEnter: state =>
                 {
                     _animator.SetBool("IsOnGround", true);
                     _animator.SetFloat("Speed", 0);
                 }
             ));
-            locomotionFSM.AddState("Move", new CharacterState(
-                onUpdateVelocity: (currentVelocity, deltaTime) =>
-                {
-                    return HVelocity * HSpeed;
-                },
+            locomotionFsm.AddState("Move", new CharacterState(
+                onUpdateVelocity: (currentVelocity, deltaTime) => HVelocity * HSpeed,
                 onUpdateRotation: (currentRotation, deltaTime) =>
                 {
                     var rot = Quaternion.Slerp(Animator.transform.rotation, Quaternion.LookRotation(HVelocity.normalized), 10 * deltaTime);
                     Animator.transform.rotation = rot;
                     return currentRotation;
                 },
-                onEnter: State =>
+                onEnter: state =>
                 {
                     _sfx.enabled = true;
                     _animator.SetBool("IsOnGround", true);
                     _animator.SetFloat("Speed", 1);
                 },
-                onExit: State =>
+                onExit: state =>
                 {
                     _sfx.enabled = false;
                 }
             ));
-            locomotionFSM.AddTransition(new Transition("Idle", "Move",
+            locomotionFsm.AddTransition(new Transition("Idle", "Move",
                 condition: transition => { return HVelocity.magnitude > 0.1f; }
             ));
-            locomotionFSM.AddTransition(new Transition("Move", "Idle",
+            locomotionFsm.AddTransition(new Transition("Move", "Idle",
                 condition: transition => HVelocity.magnitude <= 0.1f
             ));
-            _fsm.AddState("Locomotion", locomotionFSM);
-            locomotionFSM.SetStartState("Idle");
+            _fsm.AddState("Locomotion", locomotionFsm);
+            locomotionFsm.SetStartState("Idle");
 
             // Fall & Jump States
             _fsm.AddState("Fall", new CharacterState(

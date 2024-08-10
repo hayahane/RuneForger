@@ -66,6 +66,7 @@ namespace RuneForger.Attack
 
         private void OnDrawGizmos()
         {
+            if (this.enabled == false) return;
             Gizmos.color = new Color(0.9f, 0.6f, 0f, 1f);
             Gizmos.DrawSphere(VolumeOrigin + transform.position, VolumeSize);
         }

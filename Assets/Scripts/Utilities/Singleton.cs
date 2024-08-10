@@ -1,13 +1,19 @@
+using System;
 using UnityEngine;
 
 public class Singleton<T> : MonoBehaviour where T : Singleton<T>, new()
 {
     private static T _instance;
+    private static bool _isDestorying = false;
 
     public static T Instance
     {
         get
         {
+            if (_isDestorying)
+            {
+                return null;
+            }
             if (_instance == null)
             {
                 SetupInstance();
@@ -47,9 +53,14 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>, new()
         }
     }
 
-    public virtual void Awake()
+    protected virtual void Awake()
     {
         RemoveDuplicates();
+    }
+
+    protected void OnDestroy()
+    {
+        _isDestorying = true;
     }
 }
 
