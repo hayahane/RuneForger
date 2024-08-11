@@ -12,6 +12,8 @@
 /[Rr]ecordings/
 /[Uu]sersettings/
 /.idea/
+/Assets/Plugins/UnityEditorDarkMode/
+/Assets/Plugins/UnityEditorDarkMode.meta
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
