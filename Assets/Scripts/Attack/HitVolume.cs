@@ -12,7 +12,6 @@ namespace RuneForger.Attack
 
         void IAttackable.OnHit(AttackInfo attackInfo)
         {
-            throw new System.NotImplementedException();
         }
     }
 }

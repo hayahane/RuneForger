@@ -4,8 +4,7 @@ namespace RuneForger
 {
     public class CameraTarget : MonoBehaviour
     {
-        [field: SerializeField]
-        public Vector2 PitchClamp { get; set; } = new(-50f, 70f);
+        [field: SerializeField] public Vector2 PitchClamp { get; set; } = new(-50f, 70f);
         public Vector2 AimInput { get; set; }
 
         private const float Threshold = 0.1f;
@@ -13,6 +12,7 @@ namespace RuneForger
         private float _cameraYaw;
 
         private float _cameraPitch;
+        public bool IsPitchLocked { get; set; }
 
         private void OnEnable()
         {
@@ -26,14 +26,16 @@ namespace RuneForger
         {
             if (AimInput.magnitude >= Threshold)
             {
-                _cameraYaw += AimInput.x;
-                _cameraPitch += AimInput.y;
+                var dir = Mathf.Sign(transform.up.y);
+                _cameraYaw += AimInput.x * dir;
+                if (!IsPitchLocked)
+                    _cameraPitch += AimInput.y * dir;
 
                 _cameraPitch = ClampAngle(_cameraPitch, PitchClamp.x, PitchClamp.y);
                 _cameraYaw = ClampAngle(_cameraYaw, float.MinValue, float.MaxValue);
             }
 
-            transform.rotation = Quaternion.Euler(_cameraPitch, _cameraYaw, 0);
+            transform.rotation = Quaternion.Euler(_cameraPitch, _cameraYaw, transform.parent.rotation.eulerAngles.z);
         }
 
         private static float ClampAngle(float angle, float min, float max)
@@ -42,6 +44,11 @@ namespace RuneForger
             if (angle > 360) angle -= 360f;
 
             return Mathf.Clamp(angle, min, max);
+        }
+        
+        public void ResetPitch()
+        {
+            _cameraPitch = 0;
         }
     }
 }

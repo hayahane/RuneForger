@@ -25,7 +25,7 @@ namespace RuneForger
         private void OnAnimatorMove()
         {
             if (IsRootMotionApplied)
-                _storedRootMotion = _animator.deltaPosition;
+                _storedRootMotion += _animator.deltaPosition;
         }
 
         private void OnDrawGizmos()

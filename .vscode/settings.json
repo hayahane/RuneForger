@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "RuneForger.sln"
+    "dotnet.defaultSolution": "RuneForger.sln",
+    "dotnet.preferCSharpExtension": true
 }

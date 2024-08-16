@@ -1,46 +1,57 @@
-using System;
 using KinematicCharacterController;
 using UnityEngine;
 using UnityHFSM;
 using Cinemachine.Utility;
 using RuneForger.Attack;
-using RuneForger.Gameplay;
+using RuneForger.GravityField;
 using RuneForger.SoundFX;
-using UnityEngine.VFX;
-using RuneForger.Interact;
+using UnityEngine.Serialization;
 
 namespace RuneForger.Character
 {
-    public class GameCharacter : MonoBehaviour, ICharacterController
+    public class GameCharacter : MonoBehaviour, ICharacterController, IGravity
     {
+        #region Movement
+
         [field: SerializeField, Header("Movement")]
         public float HSpeed { get; set; } = 4.5f;
-        [field: SerializeField]
-        public float JumpHeight { get; set; } = 1.5f;
-        [field: SerializeField]
-        public float JumpHeightExtra { get; set; } = 0.5f;
-        [SerializeField, Header("Combo")]
-        private ComboAsset _comboAsset;
+
+        [field: SerializeField] public float JumpHeight { get; set; } = 1.5f;
+        [field: SerializeField] public float JumpHeightExtra { get; set; } = 0.5f;
+
+        #endregion
+
+        #region Combat
+
+        [FormerlySerializedAs("_comboAsset")] [SerializeField, Header("Combo")]
+        private ComboAsset comboAsset;
+
         public ComboAsset ComboAsset
         {
-            get => _comboAsset;
+            get => comboAsset;
             set
             {
-                _comboAsset = value;
+                comboAsset = value;
                 if (_fsm != null)
                 {
                     var attackState = _fsm.GetState("Attack") as AttackState;
-                    attackState.ComboAsset = value;
+                    attackState!.ComboAsset = value;
                 }
             }
         }
 
-        [SerializeField, Header("Sound")]
-        private RandomSFX _sfx;
-        [field: SerializeField]
-        public RandomSFX Voice{get; private set;}
+        #endregion
 
-        public bool IsRotationLocked { get; set; }
+        #region Sound&Visual Effects
+
+        [FormerlySerializedAs("_sfx")] [SerializeField, Header("Sound")]
+        private RandomSFX sfx;
+
+        [field: SerializeField] public RandomSFX Voice { get; private set; }
+
+        #endregion
+
+        
         public Vector3 HVelocity { get; set; }
         public Vector3 VVelocity { get; set; }
         public bool IsJumping { get; set; }
@@ -48,22 +59,33 @@ namespace RuneForger.Character
 
         public KinematicCharacterMotor Motor { get; private set; }
         private readonly CharacterFSM _fsm = new();
-        private Animator _animator;
-        public Animator Animator => _animator;
-        public RootMotionHelper RMHelper { get; private set; }
+        private GravityChangeState _gravityChangeState;
+
+        #region Animation Control
+
+        private static readonly int IsOnGround = Animator.StringToHash("IsOnGround");
+        private static readonly int Jump = Animator.StringToHash("Jump");
+        private static readonly int Speed = Animator.StringToHash("Speed");
+        public Animator Animator { get; private set; }
+        public RootMotionHelper RmHelper { get; private set; }
+
+        #endregion
+
         public AttackVolume AttackVolume { get; private set; }
-        [field: SerializeField]
-        public TrailRenderer Trail { get; private set; }
+        [field: SerializeField] public TrailRenderer Trail { get; private set; }
+
+        private Vector3 Gravity { get; set; } = Vector3.down * 9.81f;
 
         #region MonoBehaviour Callbacks
+
         private void Start()
         {
             // Get the KinematicCharacterMotor component
             Motor = GetComponent<KinematicCharacterMotor>();
             // Assign this GameCharacter to the motor's CharacterController property
             Motor.CharacterController = this;
-            _animator = GetComponentInChildren<Animator>();
-            RMHelper = GetComponentInChildren<RootMotionHelper>();
+            Animator = GetComponentInChildren<Animator>();
+            RmHelper = GetComponentInChildren<RootMotionHelper>();
 
             AttackVolume = GetComponent<AttackVolume>();
 
@@ -79,32 +101,29 @@ namespace RuneForger.Character
                 onUpdateVelocity: (currentVelocity, deltaTime) => Vector3.zero,
                 onEnter: state =>
                 {
-                    _animator.SetBool("IsOnGround", true);
-                    _animator.SetFloat("Speed", 0);
+                    Animator.SetBool(IsOnGround, true);
+                    Animator.SetFloat(Speed, 0);
                 }
             ));
             locomotionFsm.AddState("Move", new CharacterState(
                 onUpdateVelocity: (currentVelocity, deltaTime) => HVelocity * HSpeed,
                 onUpdateRotation: (currentRotation, deltaTime) =>
                 {
-                    var rot = Quaternion.Slerp(Animator.transform.rotation, Quaternion.LookRotation(HVelocity.normalized), 10 * deltaTime);
-                    Animator.transform.rotation = rot;
-                    return currentRotation;
+                    var rot = Quaternion.Slerp(Animator.transform.rotation,
+                        Quaternion.LookRotation(HVelocity.normalized, Motor.CharacterUp), 10 * deltaTime);
+                    //Animator.transform.rotation = rot;
+                    return rot;
                 },
                 onEnter: state =>
                 {
-                    _sfx.enabled = true;
-                    _animator.SetBool("IsOnGround", true);
-                    _animator.SetFloat("Speed", 1);
+                    sfx.enabled = true;
+                    Animator.SetBool(IsOnGround, true);
+                    Animator.SetFloat(Speed, 1);
                 },
-                onExit: state =>
-                {
-                    _sfx.enabled = false;
-                }
+                onExit: state => { sfx.enabled = false; }
             ));
             locomotionFsm.AddTransition(new Transition("Idle", "Move",
-                condition: transition => { return HVelocity.magnitude > 0.1f; }
-            ));
+                condition: transition => HVelocity.magnitude > 0.1f));
             locomotionFsm.AddTransition(new Transition("Move", "Idle",
                 condition: transition => HVelocity.magnitude <= 0.1f
             ));
@@ -115,12 +134,9 @@ namespace RuneForger.Character
             _fsm.AddState("Fall", new CharacterState(
                 onUpdateVelocity: (currentVelocity, deltaTime) =>
                 {
-                    return currentVelocity + Vector3.down * 9.81f * deltaTime;
+                    return currentVelocity + Gravity * deltaTime;
                 },
-                onEnter: State =>
-                {
-                    _animator.SetBool("IsOnGround", false);
-                }
+                onEnter: _ => { Animator.SetBool(IsOnGround, false); }
             ));
             _fsm.AddTransition(new Transition("Locomotion", "Fall",
                 condition: transition => !Motor.GroundingStatus.IsStableOnGround
@@ -131,29 +147,24 @@ namespace RuneForger.Character
             _fsm.AddState("Jump", new CharacterState(
                 onUpdateVelocity: (currentVelocity, deltaTime) =>
                 {
-                    Debug.Log($"Must Unground: {Motor.MustUnground()}");
                     Motor.ForceUnground();
-                    VVelocity += Physics.gravity * deltaTime;
+                    VVelocity += Gravity * deltaTime;
                     return VVelocity + currentVelocity.ProjectOntoPlane(Motor.CharacterUp);
                 },
-                onEnter: State =>
+                onEnter: _ =>
                 {
                     Voice.PlayRandomly();
-                    _animator.SetTrigger("Jump");
-                    VVelocity = Vector3.up * Mathf.Sqrt(2 * JumpHeight * 9.81f);
+                    Animator.SetTrigger(Jump);
+                    VVelocity = Motor.CharacterUp * Mathf.Sqrt(2 * JumpHeight * 9.81f);
                     Motor.ForceUnground(VVelocity.magnitude / 9.81f);
-                    Debug.Log($"Init Velocity: {VVelocity}");
                 },
-                onExit: State =>
-                {
-                    IsJumping = false;
-                }
+                onExit: _ => { IsJumping = false; }
             ));
             _fsm.AddTransition(new Transition("Locomotion", "Jump",
                 condition: transition => IsJumping
             ));
             _fsm.AddTransition(new Transition("Jump", "Fall",
-                condition: transition => VVelocity.y <= 0
+                condition: transition => VVelocity.y * Motor.CharacterUp.y <= 0
             ));
 
             // Attack State
@@ -164,6 +175,12 @@ namespace RuneForger.Character
             _fsm.AddTransition(new Transition("Attack", "Locomotion"));
 
             _fsm.SetStartState("Locomotion");
+            
+            // Gravity Change State
+            _gravityChangeState = new GravityChangeState(this, true);
+            _fsm.AddState("GravityChange", _gravityChangeState);
+            _fsm.AddTriggerTransitionFromAny("GravityChange", new Transition("","GravityChange"));
+            _fsm.AddTransition(new Transition("GravityChange", "Fall"));
         }
 
         private void Update()
@@ -175,6 +192,7 @@ namespace RuneForger.Character
         #endregion
 
         #region KCC Implementation
+
         public void AfterCharacterUpdate(float deltaTime)
         {
         }
@@ -192,11 +210,13 @@ namespace RuneForger.Character
         {
         }
 
-        public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport)
+        public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint,
+            ref HitStabilityReport hitStabilityReport)
         {
         }
 
-        public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport)
+        public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint,
+            ref HitStabilityReport hitStabilityReport)
         {
         }
 
@@ -204,7 +224,8 @@ namespace RuneForger.Character
         {
         }
 
-        public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport)
+        public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint,
+            Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport)
         {
         }
 
@@ -217,6 +238,20 @@ namespace RuneForger.Character
         {
             _fsm.UpdateVelocity(ref currentVelocity, deltaTime);
         }
+
         #endregion
+
+
+        void IGravity.OnGravityChanged(in Vector3 oldValue, in Vector3 newValue)
+        {
+            Debug.Log("Gravity Changed");
+            Gravity = newValue * 9.81f;
+            _gravityChangeState.GravityTargetDir = newValue;
+            _fsm.Trigger("GravityChange");
+        }
+
+        void IGravity.OnForceFieldChanged(in Vector3 oldValue, in Vector3 newValue)
+        {
+        }
     }
 }

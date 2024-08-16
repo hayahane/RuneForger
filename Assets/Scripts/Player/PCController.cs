@@ -46,7 +46,9 @@ namespace RuneForger
 
         private void Update()
         {
-            Character.HVelocity = Quaternion.Euler(0, ViewCamera.transform.eulerAngles.y, 0)
+            var up = Vector3.Project(ViewCamera.transform.up, Vector3.up).normalized;
+            var forward = Vector3.ProjectOnPlane(ViewCamera.transform.forward, Vector3.up).normalized;
+            Character.HVelocity = Quaternion.LookRotation(forward, up)
                     * new Vector3(_moveInput.x, 0, _moveInput.y);
         }
 
@@ -58,8 +60,6 @@ namespace RuneForger
         private void OnJumpInput(InputAction.CallbackContext context)
         {
             Character.IsJumping = context.started;
-            if (Character.IsJumping)
-                Debug.Log("Input Jumping");
         }
 
         private void OnLookInput(InputAction.CallbackContext context)
