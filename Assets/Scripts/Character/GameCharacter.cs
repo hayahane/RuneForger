@@ -242,19 +242,19 @@ namespace RuneForger.Character
         #endregion
 
 
-        void IGravity.OnGravityChanged(in Vector3 oldValue, in Vector3 newValue)
+        void IGravity.OnGravityChanged(in Vector3 oldDir, in Vector3 newDir)
         {
             Debug.Log("Gravity Changed");
-            Gravity = newValue * 9.81f;
-            _gravityChangeState.GravityTargetDir = newValue;
+            Gravity = newDir * 9.81f;
+            _gravityChangeState.GravityTargetDir = newDir;
             _fsm.Trigger("GravityChange");
         }
 
-        void IGravity.OnForceFieldEnter()
+        void IGravity.OnForceFieldEnter(in Vector3 fieldPos)
         {
         }
 
-        void IGravity.OnForceFieldExit()
+        void IGravity.OnForceFieldExit(in Vector3 fieldPos)
         {
         }
 

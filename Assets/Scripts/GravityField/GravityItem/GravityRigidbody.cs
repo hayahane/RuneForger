@@ -30,17 +30,17 @@ namespace RuneForger.GravityField.GravityItem
 
         #region IGravity Implementation
 
-        void IGravity.OnGravityChanged(in Vector3 oldValue, in Vector3 newValue)
+        void IGravity.OnGravityChanged(in Vector3 oldDir, in Vector3 newDir)
         {
-            _gravity = newValue;
+            _gravity = newDir;
         }
 
-        void IGravity.OnForceFieldEnter()
+        void IGravity.OnForceFieldEnter(in Vector3 fieldPos)
         {
             _isInForceField = true;
         }
 
-        void IGravity.OnForceFieldExit()
+        void IGravity.OnForceFieldExit(in Vector3 fieldPos)
         {
             _isInForceField = false;
         }

@@ -1,3 +1,4 @@
+using RuneForger.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 

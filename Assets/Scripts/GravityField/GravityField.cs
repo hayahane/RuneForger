@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 namespace RuneForger.GravityField
 {
@@ -12,15 +13,15 @@ namespace RuneForger.GravityField
         private const float Magnitude = 9.81f;
         
         [SerializeField]
-        private Vector3 _fieldDirection = Vector3.down;
+        private Vector3 fieldDirection = Vector3.down;
         public Vector3 FieldDirection
         {
-            get => _fieldDirection;
+            get => fieldDirection;
             set
             {
-                var oldValue = _fieldDirection;
-                _fieldDirection = value.normalized;
-                OnFieldChanged(oldValue, _fieldDirection);
+                var oldDir = fieldDirection;
+                fieldDirection = value.normalized;
+                OnFieldChanged(oldDir, fieldDirection);
             }
         }
         public Vector3 Gravity => Magnitude * FieldDirection;
@@ -54,11 +55,11 @@ namespace RuneForger.GravityField
             Initialize();
         }
 
-        private void OnFieldChanged(in Vector3 oldValue, in Vector3 newValue)
+        private void OnFieldChanged(in Vector3 oldDir, in Vector3 newDir)
         {
             foreach (var gravityObject in _gravityObjects)
             {
-                gravityObject.OnGravityChanged(oldValue, newValue);
+                gravityObject.OnGravityChanged(oldDir, newDir);
             }
         }
         

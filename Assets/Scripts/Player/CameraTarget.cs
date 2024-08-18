@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RuneForger
+namespace RuneForger.Player
 {
     public class CameraTarget : MonoBehaviour
     {

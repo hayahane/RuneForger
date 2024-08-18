@@ -6,15 +6,13 @@ namespace RuneForger.GravityField
 {
     public class ForceField : MonoBehaviour
     {
-        [SerializeField]
-        private float radius = 8f;
         private readonly LinkedList<IGravity> _gravityObjects = new();
 
         private void OnTriggerEnter(Collider other)
         {
             var gravity = other.GetComponent<IGravity>();
             if (gravity == null) return;
-            gravity.OnForceFieldEnter();
+            gravity.OnForceFieldEnter(transform.position);
             _gravityObjects.AddLast(gravity);
         }
 
@@ -22,7 +20,7 @@ namespace RuneForger.GravityField
         {
             var gravity = other.GetComponent<IGravity>();
             if (gravity == null) return;
-            gravity.OnForceFieldExit();
+            gravity.OnForceFieldExit(transform.position);
             _gravityObjects.Remove(gravity);
         }
 
