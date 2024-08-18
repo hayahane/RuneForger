@@ -6,6 +6,8 @@ namespace RuneForger.GravityField
     {
         public void OnGravityChanged(in Vector3 oldValue, in Vector3 newValue);
 
-        public void OnForceFieldChanged(in Vector3 oldValue, in Vector3 newValue);
+        public void OnForceFieldEnter();
+        public void OnForceFieldExit();
+        public void OnForceFieldChanged(in Vector3 fieldPos);
     }
 }
