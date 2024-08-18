@@ -1,7 +1,5 @@
-﻿using System;
-using KinematicCharacterController;
+﻿using KinematicCharacterController;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace RuneForger.Scene
 {

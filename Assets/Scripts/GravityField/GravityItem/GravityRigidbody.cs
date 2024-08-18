@@ -18,9 +18,15 @@ namespace RuneForger.GravityField.GravityItem
 
         private void Update()
         {
-            var force = _isInForceField ? _gravity : (_forceFieldPos - transform.position).normalized * 9.81f;
-            _rigidbody.AddForce(force, ForceMode.Acceleration);
+            if (!_isInForceField)
+                _rigidbody.AddForce(_gravity, ForceMode.Acceleration);
+            else
+            {
+                var v = (_forceFieldPos - transform.position).normalized;
+                _rigidbody.velocity = v * 10f;
+            }
         }
+        
 
         #region IGravity Implementation
 
