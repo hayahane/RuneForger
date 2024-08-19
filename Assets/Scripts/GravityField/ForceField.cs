@@ -31,5 +31,14 @@ namespace RuneForger.GravityField
                 gravity.OnForceFieldChanged(transform.position);
             }
         }
+
+        private void OnDisable()
+        {
+            foreach (var gravity in _gravityObjects)
+            {
+                gravity.OnForceFieldExit(transform.position);
+            }
+            _gravityObjects.Clear();
+        }
     }
 }

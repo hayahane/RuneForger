@@ -1,3 +1,4 @@
+using RuneForger.Gameplay;
 using RuneForger.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -43,6 +44,9 @@ namespace RuneForger
             playerInput.actions["Attack"].canceled += _ => Character.IsAttacking = false;
 
             playerInput.actions["Interact"].performed += _ => Interact.Interact();
+            
+            playerInput.actions["ForceField"].started += OnForceFieldControl;
+            playerInput.actions["ForceField"].canceled += OnForceFieldControl;
         }
 
         private void Update()
@@ -71,6 +75,23 @@ namespace RuneForger
         private void OnReleaseCursorInput(InputAction.CallbackContext context)
         {
             Cursor.lockState = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
+        }
+        
+        private void OnForceFieldControl(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                if (GameplayManager.Instance.ForceFieldEmitter.IsFieldActive)
+                    GameplayManager.Instance.ForceFieldEmitter.Dissolve();
+                else
+                    GameplayManager.Instance.ForceFieldEmitter.BeginAiming();
+            }
+
+            if (context.canceled)
+            {   
+                if (GameplayManager.Instance.ForceFieldEmitter.IsAiming)
+                     GameplayManager.Instance.ForceFieldEmitter.Emit();
+            }
         }
     }
 }

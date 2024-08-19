@@ -8,12 +8,14 @@ namespace RuneForger.Character
         [field: SerializeField] public float MaxHitPoints { get; private set; } = 30f;
         private float _currentHitPoints;
         public event Action CharacterDieEvent;
+        public event Action<float, float> HitPointChangeEvent; 
         public float CurrentHitPoints
         {
             get => _currentHitPoints;
             set
             {
                 _currentHitPoints = Mathf.Clamp(value, 0, MaxHitPoints);
+                HitPointChangeEvent?.Invoke(_currentHitPoints, MaxHitPoints);
                 if (_currentHitPoints <= 0)
                 {
                     CharacterDieEvent?.Invoke();
