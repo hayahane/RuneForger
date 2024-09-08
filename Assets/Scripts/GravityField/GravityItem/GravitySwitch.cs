@@ -53,6 +53,19 @@ namespace RuneForger.GravityField.GravityItem
             _downMaterial.SetFloat(Height, (changeTime - _timer) / changeTime * _height);
             _upMaterial.SetFloat(Height, (_timer) / changeTime * _height);
         }
+        
+        private void OnDrawGizmos()
+        {
+            if (onSwitchStateChange == null) return;
+            Gizmos.color = new Color(0.7f, 0.5f, 0.2f, 0.5f);
+            for (var i = 0; i < onSwitchStateChange.GetPersistentEventCount(); i++)
+            {
+                if (onSwitchStateChange.GetPersistentTarget(i) is Component target)
+                {
+                    Gizmos.DrawLine(transform.position, target.transform.position);
+                }
+            }
+        }
 
         private void CheckSwitchState()
         {

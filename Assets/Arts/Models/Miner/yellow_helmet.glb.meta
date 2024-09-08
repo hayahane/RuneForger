@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 9f3ccc6273e2b9548b99c8908b069844
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: yellowhelmet
+    second: {fileID: 2100000, guid: 0350439eaf1db154e8bbf992d4099e10, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: cc45016b844e7624dae3aec10fb443ea, type: 3}
+  reverseAxis: 0
+  renderPipeline: 1

@@ -44,12 +44,23 @@ namespace RuneForger.Scene
         }
         
         // Start the elevator, 由外部调用
-        public void ChangeLevel()
+        public void NextLevel()
         {
             _currentWaypointIndex += 1;
             _currentWaypointIndex %= 2;
             _isOperating = true;
         }
+
+        public void ChangeToLevel(int level)
+        {
+            if (level < 0 || level >= _waypoints.Length)
+            {
+                Debug.LogError("Invalid level");
+                return;
+            }
+            _currentWaypointIndex = level;
+        }
+        
 
         private void OnDrawGizmos()
         {

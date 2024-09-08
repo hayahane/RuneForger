@@ -18,11 +18,12 @@ namespace RuneForger.Gameplay
 
         protected override void Awake()
         {
-            PlayerCharacter = FindAnyObjectByType<GameCharacter>();
+            PlayerCharacter = GameObject.FindWithTag("Player").GetComponent<GameCharacter>();
             Status = PlayerCharacter.GetComponent<CharacterStatus>();
+            CharacterInteract = PlayerCharacter.GetComponent<CharacterInteract>();
+            
             ForceFieldEmitter = FindAnyObjectByType<ForceFieldEmitter>();
             
-            CharacterInteract = PlayerCharacter.GetComponent<CharacterInteract>();
             PCController = FindAnyObjectByType<PCController>();
             ViewCamera = PCController.ViewCamera;
             InteractLabel = FindAnyObjectByType<InteractLabel>();

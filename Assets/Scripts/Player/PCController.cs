@@ -1,9 +1,8 @@
 using RuneForger.Gameplay;
-using RuneForger.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace RuneForger
+namespace RuneForger.Player
 {
     public class PCController : MonoBehaviour
     {

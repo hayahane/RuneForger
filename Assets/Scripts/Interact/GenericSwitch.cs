@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 namespace RuneForger.Interact
@@ -7,7 +6,7 @@ namespace RuneForger.Interact
     public class GenericSwitch : InteractItem
     {
         [SerializeField]
-        private string switchText = "Press E to interact";
+        private string switchText = "交互";
         public override string InteractText => switchText;
         [SerializeField]
         private UnityEvent onSwitchOn;

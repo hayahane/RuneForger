@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using RuneForger.GravityField.GravityItem;
 using UnityEngine.Serialization;
 
 namespace RuneForger.GravityField
@@ -8,6 +9,8 @@ namespace RuneForger.GravityField
     [RequireComponent(typeof(BoxCollider))]
     public class GravityField : MonoBehaviour
     {
+        [field: SerializeField]
+        private LayerMask mask;
         [field: SerializeField] 
         public Vector3 Extends { get; set; } = Vector3.one * 10;
         private const float Magnitude = 9.81f;
@@ -31,7 +34,8 @@ namespace RuneForger.GravityField
         private void Initialize()
         {
             var cols = new Collider[32];
-            var size = Physics.OverlapBoxNonAlloc(transform.position, Extends, cols);
+            var size = Physics.OverlapBoxNonAlloc(transform.position, Extends, cols, 
+                    transform.rotation, mask);
             if (size <= 0 ) return;
             for (var i = 0; i < size; i++)
             {
@@ -39,6 +43,12 @@ namespace RuneForger.GravityField
                 if (gravityObject != null)
                 {
                     AddGravityObject(gravityObject);
+                }
+                
+                var fieldSwitcher = cols[i].GetComponent<FieldSwitcher>();
+                if (fieldSwitcher != null)
+                {
+                    fieldSwitcher.GravityField = this;
                 }
             }
         }

@@ -3,7 +3,7 @@ using UnityHFSM;
 using Cinemachine.Utility;
 using KinematicCharacterController;
 using System;
-using RuneForger.Attack;
+using RuneForger.Battle;
 using RuneForger.Player;
 using UniVRM10;
 

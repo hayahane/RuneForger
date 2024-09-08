@@ -2,7 +2,7 @@ using KinematicCharacterController;
 using UnityEngine;
 using UnityHFSM;
 using Cinemachine.Utility;
-using RuneForger.Attack;
+using RuneForger.Battle;
 using RuneForger.GravityField;
 using RuneForger.SoundFX;
 using UnityEngine.Serialization;

@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace RuneForger.Interact
 {
+    [SelectionBase]
     public class BonusChest : InteractItem
     {
         private bool _isOpen;

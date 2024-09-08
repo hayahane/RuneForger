@@ -359,7 +359,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 182b3a006292548c087ea83fe53e51db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _character: {fileID: 1520644213}
 --- !u!65 &132820441
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13018,6 +13017,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2effbdd3a48044932bd182009e959e87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <GravityField>k__BackingField: {fileID: 0}
   _interactText: Interact with Torus
 --- !u!1 &960955856
 GameObject:
@@ -14884,7 +14884,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 842bb30d1891f4893a68f971c6b529e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerInput: {fileID: 1403695883}
+  playerInput: {fileID: 1403695883}
   <Character>k__BackingField: {fileID: 1520644213}
   <Interact>k__BackingField: {fileID: 1520644218}
   <ViewCamera>k__BackingField: {fileID: 330585545}
@@ -15135,9 +15135,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <HSpeed>k__BackingField: 4.5
   <JumpHeight>k__BackingField: 1.5
-  <JumpHeightExtra>k__BackingField: 0.5
-  _comboAsset: {fileID: 11400000, guid: 410dcf9635c834de0bea21f230096fd6, type: 2}
-  _sfx: {fileID: 59218549}
+  comboAsset: {fileID: 11400000, guid: 410dcf9635c834de0bea21f230096fd6, type: 2}
+  sfx: {fileID: 59218549}
   <Voice>k__BackingField: {fileID: 1313680551}
   <Trail>k__BackingField: {fileID: 1280052380}
 --- !u!114 &1520644214
